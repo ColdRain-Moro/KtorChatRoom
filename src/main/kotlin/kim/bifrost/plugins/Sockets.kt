@@ -1,5 +1,6 @@
 package kim.bifrost.plugins
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.*
@@ -12,7 +13,7 @@ import java.util.*
 import java.util.logging.LogManager
 
 val logger = LogManager.getLogManager().getLogger("ChatRoom")
-val gson = GsonBuilder().create()
+val gson: Gson = GsonBuilder().create()
 
 fun Application.configureSockets() {
     install(WebSockets) {
@@ -76,6 +77,20 @@ fun Application.configureSockets() {
             } finally {
                 connections -= thisConnection
                 println("${thisConnection.name} exit with avatar: ${thisConnection.avatar}")
+                connections.forEach {
+                    it.session.outgoing.send(
+                        Frame.Text(
+                            gson.toJson(
+                                ChatMessageBean(
+                                    "CLOSE",
+                                    thisConnection.name,
+                                    null,
+                                    thisConnection.avatar
+                                )
+                            )
+                        )
+                    )
+                }
             }
         }
     }

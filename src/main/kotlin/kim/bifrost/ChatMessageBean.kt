@@ -11,5 +11,6 @@ data class ChatMessageBean(
     val type: String,
     val username: String,
     val data: String?,
-    val avatar: String
+    val avatar: String,
+    val date: Long = System.currentTimeMillis()
 )
